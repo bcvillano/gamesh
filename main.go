@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
-	"unicode"
 )
 
 var wordbank = []string{"redteam", "shell", "service", "downtime"}
@@ -76,35 +76,43 @@ var hangmanStages = []string{
 }
 
 func playHangman() bool {
+	reader := bufio.NewReader(os.Stdin)
 	word := wordbank[rand.Intn(len(wordbank))]
 	displayStr := strings.Repeat("_", len(word))
-	var userin string
-	for i := 0; i < len(hangmanStages)-1; i++ {
-		fmt.Println(hangmanStages[i])
+	stage := 0
+	for stage < len(hangmanStages) {
+		var indexes []int
+		fmt.Println(hangmanStages[stage])
 		fmt.Println(displayStr)
-		fmt.Print("\nGuess: ")
-		_, err := fmt.Scan(&userin)
+		fmt.Print("\nGuess a letter: ")
+		char, _, err := reader.ReadRune()
 		if err != nil {
 			println(err.Error())
 			return false
 		}
-		fmt.Println("User Input: " + userin)
 		fmt.Println("Word: " + word)
-		if userin == word {
-			return true
-		} else {
-			for j := 0; j < len(word); j++ {
-				if word[j] == userin[j] {
-					//Strings in Go are immutable so we need to make a new one to replace old displayStr
-					runes := []rune(displayStr)
-					runes[j] = unicode.ToLower(rune(word[j]))
-					displayStr = string(runes)
-				}
+		for i, c := range word {
+			if c == char {
+				indexes = append(indexes, i)
 			}
 		}
+		if len(indexes) == 0 {
+			stage++
+		} else {
+			tempStr := []rune(displayStr)
+			for _, idx := range indexes {
+				tempStr[idx] = char
+			}
+			displayStr = string(tempStr)
+		}
+		if displayStr == word { //win condition
+			fmt.Println("YOU WIN!!! Enjoy your shell")
+			return true
+		}
 	}
-	fmt.Println(hangmanStages[len(hangmanStages)-1])
-	fmt.Println("You lose! Try again...\n\n")
+	fmt.Println(hangmanStages[len(hangmanStages)-1]) //prints final hanged man
+	fmt.Print(displayStr + "\n\n")
+	fmt.Println("You lose! The word was " + word)
 	return false
 }
 
