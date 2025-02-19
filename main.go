@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var wordbank = []string{"redteam", "shell", "service", "downtime"}
+var wordbank = []string{"redteam", "shell", "service", "downtime", "beacon", "persistence", "backdoor", "firewall", "incident", "inject"}
 var hangmanStages = []string{
 	`
          -----
@@ -85,12 +85,18 @@ func playHangman() bool {
 		fmt.Println(hangmanStages[stage])
 		fmt.Println(displayStr)
 		fmt.Print("\nGuess a letter: ")
-		char, _, err := reader.ReadRune()
+		input, err := reader.ReadString('\n') // Read full line
 		if err != nil {
-			println(err.Error())
+			fmt.Println("Error reading input:", err)
 			return false
 		}
-		fmt.Println("Word: " + word)
+		input = strings.TrimSpace(strings.ToLower(input)) // Normalize input
+		if len(input) != 1 || input[0] < 'a' || input[0] > 'z' {
+			fmt.Println("Invalid input. Please enter a single letter.")
+			continue
+		}
+		char := rune(input[0])
+		//fmt.Println("Word: " + word) //Debug line
 		for i, c := range word {
 			if c == char {
 				indexes = append(indexes, i)
