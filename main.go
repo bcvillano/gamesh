@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"strings"
+	"unicode"
 )
 
 var wordbank = []string{"redteam", "shell", "service", "downtime"}
@@ -74,11 +76,12 @@ var hangmanStages = []string{
 }
 
 func playHangman() bool {
-	length := len(hangmanStages)
 	word := wordbank[rand.Intn(len(wordbank))]
+	displayStr := strings.Repeat("_", len(word))
 	var userin string
-	for i := 0; i < length-1; i++ {
+	for i := 0; i < len(hangmanStages)-1; i++ {
 		fmt.Println(hangmanStages[i])
+		fmt.Println(displayStr)
 		fmt.Print("\nGuess: ")
 		_, err := fmt.Scan(&userin)
 		if err != nil {
@@ -86,11 +89,21 @@ func playHangman() bool {
 			return false
 		}
 		fmt.Println("User Input: " + userin)
+		fmt.Println("Word: " + word)
 		if userin == word {
 			return true
+		} else {
+			for j := 0; j < len(word); j++ {
+				if word[j] == userin[j] {
+					//Strings in Go are immutable so we need to make a new one to replace old displayStr
+					runes := []rune(displayStr)
+					runes[j] = unicode.ToLower(rune(word[j]))
+					displayStr = string(runes)
+				}
+			}
 		}
 	}
-	fmt.Println(hangmanStages[length-1])
+	fmt.Println(hangmanStages[len(hangmanStages)-1])
 	fmt.Println("You lose! Try again...\n\n")
 	return false
 }
