@@ -89,7 +89,7 @@ func playHangman() bool {
 	word := wordbank[rand.Intn(len(wordbank))]
 	displayStr := strings.Repeat("_", len(word))
 	stage := 0
-	for stage < len(hangmanStages) - 1 {
+	for stage < len(hangmanStages)-1 {
 		var indexes []int
 		fmt.Println(hangmanStages[stage])
 		fmt.Println(displayStr)
@@ -109,7 +109,7 @@ func playHangman() bool {
 			continue
 		}
 		char := rune(input[0])
-		fmt.Println("Word: " + word) //Debug line
+		//fmt.Println("Word: " + word) //Debug line
 		for i, c := range word {
 			if c == char {
 				indexes = append(indexes, i)
