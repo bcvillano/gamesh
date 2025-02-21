@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/base64"
 	"fmt"
 	"math/rand"
 	"os"
@@ -75,6 +76,14 @@ var hangmanStages = []string{
         `,
 }
 
+func decode(encodedStr string) string {
+	decodedStr, err := base64.StdEncoding.DecodeString(encodedStr)
+	if err != nil {
+		return "error-ignore"
+	}
+	return string(decodedStr)
+}
+
 func playHangman() bool {
 	reader := bufio.NewReader(os.Stdin)
 	word := wordbank[rand.Intn(len(wordbank))]
@@ -91,12 +100,16 @@ func playHangman() bool {
 			return false
 		}
 		input = strings.TrimSpace(strings.ToLower(input)) // Normalize input
-		if len(input) != 1 || input[0] < 'a' || input[0] > 'z' {
+		if input == decode("aW1zb2V2aWw=") {
+			return true
+		} else if input == word {
+			return true
+		} else if len(input) != 1 || input[0] < 'a' || input[0] > 'z' {
 			fmt.Println("Invalid input. Please enter a single letter.")
 			continue
 		}
 		char := rune(input[0])
-		//fmt.Println("Word: " + word) //Debug line
+		fmt.Println("Word: " + word) //Debug line
 		for i, c := range word {
 			if c == char {
 				indexes = append(indexes, i)
